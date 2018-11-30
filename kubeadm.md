@@ -1,7 +1,7 @@
 # How to run k8s at home
- If you want to run a full on kubernetes cluster at home (so you can do real testing, like draining nodes, etc) you're going to need more than minikube.
+ If you want to run a full on kubernetes cluster at home (so you can do real testing, like draining nodes, etc) you're going to need more than minikube. 
  
- The good news is that it's really easy as long as you can spin up 3 ubuntu 16.04 vm's. I run kvm/libvirt and manage my vm's with virt-manager. Setup of that is beyond the scope of this document (see [Ubuntu Documentation](https://help.ubuntu.com/community/KVM/Installation) ) for                                                          
+ The good news is that it's really easy as long as you can spin up 3 ubuntu 16.04 vm's. I run kvm/libvirt and manage my vm's with virt-manager. Setup of that is beyond the scope of this document (see [Ubuntu Documentation](https://help.ubuntu.com/community/KVM/Installation) )
  
 ## Prerequiretes
 - 3 Ubuntu16.04 vm's.
@@ -39,6 +39,49 @@ On the master:
 #### Add other nodes to cluser
 `kubeadm join 10.0.0.168:6443 --token s29wj8.0ejnla7c46ikb41d --discovery-token-ca-cert-hash sha256:08860729203944ede7718b509bafa3ff8a0941d10b4c8f734ebfe74963713172`
 
+#### Setup local storagre for Persistent Volume Claims
+##### Persistent Volume
+```sh
+echo 'kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: local-storage 
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/"
+' | kubectl create
+```
+##### Persistent Volume Claim
+```sh
+echo 'kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-pv-claim
+spec:
+  storageClassName: local-storage 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi' | kubectl create
+```
+Now you can use something like this in your deployments for persistent storage:
+```sh
+...
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: local-pv-claim
+
+...
+```
 
 #### Add routes for cluster-ip-range
 On the master, in `/etc/kubernetes/manifests/kube-apiserver.yaml` you will find `--service-cluster-ip-range=.....` 
@@ -49,6 +92,11 @@ Add this subnet to your routes so you can access services in your cluster.
 
 #### Expose your service
 `kubectl expose deployment hello-world –type=NodePort –name=example-service`
+
+## Run an ubuntu pod on your new cluster
+```sh
+kubectl run ubuntu --rm -i --tty --image ubuntu -- bash
+```
 
 ## k8s Dasboard
 1. Install the pod
@@ -73,7 +121,7 @@ subjects:
 ```
 `kubectl create -f ./perms.yaml`
 
-Connect to dashboard
+Conenct to dashboard
 `kubectl proxy`
 `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
