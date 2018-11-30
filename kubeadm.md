@@ -56,7 +56,7 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/data/"
-' | kubectl create
+' > pv.yaml && kubectl create -f pv.yaml
 ```
 ##### Persistent Volume Claim
 ```sh
@@ -70,7 +70,7 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi' | kubectl create
+      storage: 1Gi' > pvc.yaml && kubectl create -f pvc.yaml
 ```
 Now you can use something like this in your deployments for persistent storage:
 ```sh
