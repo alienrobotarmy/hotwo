@@ -70,7 +70,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi' > pvc.yaml && kubectl create -f pvc.yaml
+      storage: 1Gi
+' > pvc.yaml && kubectl create -f pvc.yaml
 ```
 Now you can use something like this in your deployments for persistent storage:
 ```sh
