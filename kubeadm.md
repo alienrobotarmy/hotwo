@@ -11,7 +11,7 @@
  
  
 ## Install the  Prerequisites
-Follow [this](https://kubernetes.io/docs/tasks/tools/install-kubeadm/) guide to install the prerequisites
+Follow [this](https://kubernetes.io/docs/setup/independent/install-kubeadm/) guide to install the prerequisites
 ```https://kubernetes.io/docs/tasks/tools/install-kubeadm/```
 
 
