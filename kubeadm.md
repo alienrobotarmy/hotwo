@@ -1,4 +1,4 @@
-# How to run k8s at home
+# How to run Kubernetes (k8s) at home
  If you want to run a full on kubernetes cluster at home (so you can do real testing, like draining nodes, etc) you're going to need more than minikube. 
  
  The good news is that it's really easy as long as you can spin up 3 ubuntu 16.04 vm's. I run kvm/libvirt and manage my vm's with virt-manager. Setup of that is beyond the scope of this document (see [Ubuntu Documentation](https://help.ubuntu.com/community/KVM/Installation) )
