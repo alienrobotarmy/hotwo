@@ -7,12 +7,36 @@
 - 3 Ubuntu16.04 vm's.
 - Docker
 - Kubeadm
+- Private Docker Registry (optional)
 - 32GB of disk space per node
- 
- 
+  
 ## Install the  Prerequisites
-Follow [this](https://kubernetes.io/docs/setup/independent/install-kubeadm/) guide to install the prerequisites
+
+Follow [this](https://kubernetes.io/docs/tasks/tools/install-kubeadm/) guide to install the prerequisites
 ```https://kubernetes.io/docs/tasks/tools/install-kubeadm/```
+
+## Setup a private Docker registry (optional)
+
+If you will be using this cluster to spin up private image builds, you may need to be able to pull from a private registry.
+
+_sourced from https://docs.docker.com/registry/deploying/_
+
+You'll need to run this registry from somewhere *other* than one of the VM's you'll be using for your K8's cluster.
+
+Let's assume you have a docker server running at `10.0.0.3`
+
+1. Ensure docker is running on your docker server
+2. On your docker server (_10.0.0.3 in our example_), start the registry
+
+   ```sh
+   docker run -d -p 5000:5000 --restart=always --name registry registry:2
+   ```
+  
+3. On each k8s node add your registry to `/etc/docker/daemon.json`
+
+   ```sh
+   { "insecure-registries":["10.0.0.3:5000"] }  
+   ```
 
 
 ## Setup your cluster
@@ -128,5 +152,10 @@ Conenct to dashboard
 
 
 ## In case you need to start over
+
+#### Clear resource off the cluster
+`kubectl delete po,svc,deployments,cronjob,job --al`
+
+#### Reinstall the cluster
 Do this on all the nodes, then the master
 `kubeadm reset`
