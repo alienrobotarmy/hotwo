@@ -12,8 +12,8 @@
   
 ## Install the  Prerequisites
 
-Follow [this](https://kubernetes.io/docs/tasks/tools/install-kubeadm/) guide to install the prerequisites
-```https://kubernetes.io/docs/tasks/tools/install-kubeadm/```
+Follow [this](https://kubernetes.io/docs/setup/independent/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl) guide to install the prerequisites
+```https://kubernetes.io/docs/setup/independent/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl```
 
 ## Setup a private Docker registry (optional)
 
@@ -32,10 +32,27 @@ Let's assume you have a docker server running at `10.0.0.3`
    docker run -d -p 5000:5000 --restart=always --name registry registry:2
    ```
   
-3. On each k8s node add your registry to `/etc/docker/daemon.json`
+3. On each k8s node
+
+   3.1 Add your registry to `/etc/docker/daemon.json`
 
    ```sh
    { "insecure-registries":["10.0.0.3:5000"] }  
+   ```
+
+   3.2 Update docker fs type
+
+   ```sh
+    cat > /etc/docker/daemon.json <<EOF
+    {
+      "exec-opts": ["native.cgroupdriver=systemd"],
+      "log-driver": "json-file",
+      "log-opts": {
+        "max-size": "100m"
+      },
+      "storage-driver": "overlay2"
+    }
+    EOF
    ```
 
 
@@ -118,6 +135,16 @@ Add this subnet to your routes so you can access services in your cluster.
 #### Expose your service
 `kubectl expose deployment hello-world –type=NodePort –name=example-service`
 
+## Your client
+
+Copy `/etc/kubernetes/admin.conf` on your kube master to your local client, and point your env to it
+
+```sh
+export KUBECONFIG=./admin.conf
+
+kubectl get pods
+```
+
 ## Run an ubuntu pod on your new cluster
 ```sh
 kubectl run ubuntu --rm -i --tty --image ubuntu -- bash
@@ -142,15 +169,28 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kubernetes-dashboard
-  namespace: kube-system" > perms.yaml
+  namespace: kube-system" > perms.yaml && kubectl create -f perms.yaml
 ```
-`kubectl create -f ./perms.yaml`
 
 Conenct to dashboard
 `kubectl proxy`
 `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
+## Helm
 
+If you want to get helm running, install the binary
+[Install Helm](https://github.com/helm/helm/releases)
+```https://github.com/helm/helm/releases```
+
+Setup helm on your cluster
+```sh
+export KUBECONFIG=./admin.conf
+helm init
+
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+```
 ## In case you need to start over
 
 #### Clear resource off the cluster
