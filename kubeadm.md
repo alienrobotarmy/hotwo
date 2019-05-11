@@ -32,12 +32,16 @@ Let's assume you have a docker server running at `10.0.0.3`
    docker run -d -p 5000:5000 --restart=always --name registry registry:2
    ```
   
-3. On each k8s node add your registry to `/etc/docker/daemon.json`
+3. On each k8s node
+3.1 
+  add your registry to `/etc/docker/daemon.json`
 
    ```sh
    { "insecure-registries":["10.0.0.3:5000"] }  
    ```
-
+3.2
+  Update docker FS
+  https://kubernetes.io/docs/setup/cri/#docker
 
 ## Setup your cluster
 On the master:
