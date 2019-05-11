@@ -144,8 +144,15 @@ kubectl run ubuntu --rm -i --tty --image ubuntu -- bash
 ```
 
 ## k8s Dasboard
+
+From (here)[https://github.com/kubernetes/dashboard]
+`https://github.com/kubernetes/dashboard`
+
 1. Install the pod
-`kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml`
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+```
 
 2. Grant permission to the dashboard
 ```sh
@@ -165,7 +172,12 @@ subjects:
   namespace: kube-system" > perms.yaml && kubectl create -f perms.yaml
 ```
 
-Conenct to dashboard
+3. Get a token to access the dashboard
+```sh
+kc get secret -o json $(kc get secret | egrep 'default-token-.*' | awk '{ print $1 }')  | jq -r '.data.token'
+```
+
+4. Conenct to dashboard
 `kubectl proxy`
 `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
