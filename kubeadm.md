@@ -32,15 +32,7 @@ Let's assume you have a docker server running at `10.0.0.3`
    docker run -d -p 5000:5000 --restart=always --name registry registry:2
    ```
   
-3. On each k8s node
-
-   3.1 Add your registry to `/etc/docker/daemon.json`
-
-   ```sh
-   { "insecure-registries":["10.0.0.3:5000"] }  
-   ```
-
-   3.2 Update docker fs type
+3. On each k8s node update docker settings
 
    ```sh
     cat > /etc/docker/daemon.json <<EOF
@@ -50,7 +42,8 @@ Let's assume you have a docker server running at `10.0.0.3`
       "log-opts": {
         "max-size": "100m"
       },
-      "storage-driver": "overlay2"
+      "storage-driver": "overlay2",
+      "insecure-registries":["10.0.0.3:5000"]
     }
     EOF
    ```
