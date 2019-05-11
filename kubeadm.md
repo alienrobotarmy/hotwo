@@ -174,7 +174,7 @@ subjects:
 
 3. Get a token to access the dashboard
 ```sh
-kc get secret -o json $(kc get secret | egrep 'default-token-.*' | awk '{ print $1 }')  | jq -r '.data.token'
+kc get secret -o json $(kc get secret | egrep 'default-token-.*' | awk '{ print $1 }')  | jq -r '.data.token' | base64 -d
 ```
 
 4. Conenct to dashboard
