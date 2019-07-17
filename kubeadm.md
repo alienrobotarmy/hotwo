@@ -61,7 +61,7 @@ On the master:
 
 #### Enable Calico Networking
 1. Deploy Calico Pod
-`kubectl apply -f https://docs.projectcalico.org/v1.5/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml`
+`kubectl apply -f ttps://docs.projectcalico.org/v3.8/manifests/calico.yaml`
 2. Wait for pods to become ready
 `watch kubectl get pods --all-namespaces`
 3. Allow pods on master
